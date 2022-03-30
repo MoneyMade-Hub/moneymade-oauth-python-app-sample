@@ -1,3 +1,4 @@
 .env
 bin
 penv
+__pycache__
