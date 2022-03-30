@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        body {
+        	font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .title {
+          font-family: Aktiv Grotesk,sans-serif;
+          text-align: center;
+        }
+
+        form {
+        	border: 3px solid #f1f1f1;
+        }
+
+        input[type=text],
+        input[type=password] {
+        	width: 100%;
+        	padding: 12px 20px;
+        	margin: 8px 0;
+        	display: inline-block;
+        	border: 1px solid #ccc;
+        	box-sizing: border-box;
+        }
+
+        button {
+          background-color: #ed2348;
+          font-family: Aktiv Grotesk,sans-serif;
+          font-weight: 500;
+          border-color: #ed2348;
+        	color: white;
+        	padding: 14px 20px;
+        	margin: 8px 0;
+        	border: none;
+        	cursor: pointer;
+        	width: 100%;
+        }
+
+        button:disabled {
+        	background-color: gray;
+        }
+
+        button:hover {
+        	opacity: 0.8;
+        }
+
+        .imgcontainer {
+        	text-align: center;
+        	margin: 24px 0 12px 0;
+        }
+
+        img.avatar {
+        	width: 10%;
+        	border-radius: 50%;
+        }
+
+        .container {
+        	padding: 16px;
+        }
+
+        .formcontainer {
+          width: 30%;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .error-container {
+          color: red;
+          text-align: center;
+        }
+
+        span.psw {
+        	float: right;
+        	padding-top: 16px;
+        }
+
+        @media screen and (max-width: 300px) {
+        	span.psw {
+        		display: block;
+        		float: none;
+        	}
+        	.cancelbtn {
+        		width: 100%;
+        	}
+        }
+      </style>
+      <script>
+        window.addEventListener('load', (event) => {
+          const query = new URL(location).searchParams;
+          const signature = query.get('signature');
+          const payload = query.get('payload');
+
+          let error = null;
+
+          if (!signature) {
+            error = 'Parameter "signature" is missed in url query string!';
+          }
+
+          if (!payload) {
+            error = 'Parameter "payload" is missed in url query string!';
+          }
+
+          if (error) {
+            document.getElementById('error-area').innerText = error;
+            document.getElementById('submit-button').disabled = true;
+          }
+        });
+      </script>
+   </head>
+   <body>
+      <h2>
+        <p class="title"> MoneyMade python oauth provider sample </p>
+      </h2>
+      <form>
+        <div class="imgcontainer">
+           <img
+             src="https://storage.googleapis.com/assets.moneymade.io/images/logos/Vector.svg"
+             alt="Avatar"
+             class="avatar"
+             width="10px"
+           >
+        </div>
+        <div class="container formcontainer">
+           <label for="uname"><b>Username</b></label>
+           <input type="text" placeholder="Enter Username" name="uname" required>
+           <label for="psw"><b>Password</b></label>
+           <input type="password" placeholder="Enter Password" name="psw" required>
+           <button id="submit-button" type="submit">Authorize</button>
+        </div>
+        <div class="container" style="background-color:#f1f1f1">
+           <p id="error-area" class="error-container">
+           </p>
+        </div>
+      </form>
+   </body>
+</html>
