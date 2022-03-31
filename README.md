@@ -22,12 +22,16 @@ Content:
     ```
 
 3. Get your environment keys in the [dashboard](https://console.moneymade.io)
+<br/>
 
 4. Create .env file and set variables:
     ```
       PUBLIC_KEY=public key here
       PRIVATE_KEY=private key here
     ```
+
+    <b>NOTE: don't use production variables to run demo app!</b>
+    <br/>
 
 5. Start an app via flask module:
     ```shell
