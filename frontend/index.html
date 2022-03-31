@@ -88,33 +88,97 @@
         }
       </style>
       <script>
-        window.addEventListener('load', (event) => {
+        const setError = (error) => {
+          document.getElementById('error-area').innerText = error;
+          document.getElementById('submit-button').disabled = true;
+        };
+
+        const closeWithError = () => {
+          setTimeout(
+            () => {
+              // closing opened page with error in the moneymade connect widget
+              // applied only for v1 version
+              // https://docs.moneymade.io/docs/interaction/connect-flow#close-oauth-popup
+              window.opener && window.opener.postMessage({ status: 'FAILED' }, '*');
+              window.parent && window.parent.postMessage({ status: 'FAILED' }, '*');
+            },
+            3000,
+          );
+        }
+
+        const readQs = () => {
           const query = new URL(location).searchParams;
           const signature = query.get('signature');
           const payload = query.get('payload');
 
+          return {
+            payload,
+            signature,
+          }
+        }
+
+        window.addEventListener('load', (event) => {
+          // Oauth page parameters validation.
+          // For more info about page params see:
+          // https://docs.moneymade.io/docs/interaction/connect-flow#oauth-page 
+          const query = readQs();
+
           let error = null;
 
-          if (!signature) {
+          if (!query.signature) {
             error = 'Parameter "signature" is missed in url query string!';
           }
 
-          if (!payload) {
+          if (!query.payload) {
             error = 'Parameter "payload" is missed in url query string!';
           }
 
           if (error) {
-            document.getElementById('error-area').innerText = error;
-            document.getElementById('submit-button').disabled = true;
+            setError(error);
           }
         });
+
+        async function authorize(...prams) {
+          const { signature, payload } = readQs();
+          
+          // Send params to backend side to handle oauth request
+          // https://docs.moneymade.io/docs/interaction/connect-flow#oauth-page
+      
+          const response = await fetch(
+            `/moneymade/oauth?signature=${signature}&payload=${payload}`,
+            {
+              method: 'POST',
+              data: JSON.stringify({}), // user creds to authorize 
+              headers: {
+                'content-type': 'application/json',
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.status !== 200 || data.status !== 'OK') {
+            closeWithError();
+            setError(data.error);
+            
+            return; 
+          }
+
+          // closing opened page with success in the moneymade connect widget
+          // applied only for v1 version
+          // https://docs.moneymade.io/docs/interaction/connect-flow#close-oauth-popup
+
+          window.parent && window.parent.postMessage({ status: 'OK' }, '*');
+          window.opener && window.opener.postMessage({ status: 'OK' }, '*');
+        }
+
       </script>
    </head>
    <body>
       <h2>
         <p class="title"> MoneyMade python oauth provider sample </p>
       </h2>
-      <form>
+      <form action="javascript:authorize()">
         <div class="imgcontainer">
            <img
              src="https://storage.googleapis.com/assets.moneymade.io/images/logos/Vector.svg"
@@ -124,11 +188,16 @@
            >
         </div>
         <div class="container formcontainer">
-           <label for="uname"><b>Username</b></label>
-           <input type="text" placeholder="Enter Username" name="uname" required>
-           <label for="psw"><b>Password</b></label>
-           <input type="password" placeholder="Enter Password" name="psw" required>
-           <button id="submit-button" type="submit">Authorize</button>
+          <label for="uname"><b>Username</b></label>
+          <input type="text" value="aa" placeholder="Enter Username" name="uname" required>
+          <label for="psw"><b>Password</b></label>
+          <input type="password" value="aa" placeholder="Enter Password" name="psw" required>
+          <button
+            id="submit-button"
+            onclick="() => authorize()"
+          >
+            Authorize
+          </button>
         </div>
         <div class="container" style="background-color:#f1f1f1">
            <p id="error-area" class="error-container">
