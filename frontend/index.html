@@ -93,19 +93,6 @@
           document.getElementById('submit-button').disabled = true;
         };
 
-        const closeWithError = () => {
-          setTimeout(
-            () => {
-              // closing opened page with error in the moneymade connect widget
-              // applied only for v1 version
-              // https://docs.moneymade.io/docs/interaction/connect-flow#close-oauth-popup
-              window.opener && window.opener.postMessage({ status: 'FAILED' }, '*');
-              window.parent && window.parent.postMessage({ status: 'FAILED' }, '*');
-            },
-            3000,
-          );
-        }
-
         const readQs = () => {
           const query = new URL(location).searchParams;
           const signature = query.get('signature');
@@ -158,10 +145,7 @@
           const data = await response.json();
 
           if (response.status !== 200 || data.status !== 'OK') {
-            closeWithError();
-            setError(data.error);
-            
-            return; 
+            return setError(data.error);
           }
 
           // closing opened page with success in the moneymade connect widget
