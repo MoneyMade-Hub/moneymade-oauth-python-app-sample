@@ -1,1 +1,3 @@
+# ignore this file, it's used for moneymade oauth demo engine
+service: python-demo-provider
 runtime: python39
