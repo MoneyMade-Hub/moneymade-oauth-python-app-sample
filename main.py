@@ -23,13 +23,66 @@ def oauth():
 
 @app.route('/moneymade/oauth', methods=['POST'])
 def handle_oauth():
-  signature = request.args.get('signature')
+  oauth_signature = request.args.get('signature')
   payload = request.args.get('payload')
   
-  if (signature is None):
+  if (oauth_signature is None):
     return { "error": 'Query sting parameter signature is required' }, 400
   
   if (payload is None):
     return { "error": 'Query sting parameter payload is required' }, 400
   
-  return { "page": "index" }, 200
+  decoded_payload = moneymadeConnect.base64_to_dict(payload)
+  user_id = decoded_payload['userId']
+  
+  if oauth_signature != moneymadeConnect.generate_signature(decoded_payload):
+    return { "error": "Oauth signature is not valid or expired" }, 400
+  
+  """
+    Next step is handling user linking and finishing of oauth request.
+    Depends on chosen data interchange strategy, you should do following:
+
+    1. Authorize user on your side (check which user is sharing internal data)
+    
+    2.
+      - For pulling strategy: generate access token which 
+          allows moneymade backend to pull data for authorized user 
+      - For pushing stategy:
+          NOTE: pushing strategy requires to push data by cron for all user_id you stored
+          a) store user_id variable to database and link it to your user's internal id
+            (it should be used to push data to linked user by cron)
+          b) collect current user accounts data according to your payload sample 
+            into accounts variable
+          
+    3. Finish oauth request
+      https://docs.moneymade.io/docs/interaction/connect-flow#oauth-page
+  """
+  
+  # typically it's loaded from database or somewhere else for authorized user
+  # dict keys are set by moneymade.io devs team according to your payload sample
+  # so this dict is agnostic, fell free to use siutable data types 
+  accounts = {
+    "userId": user_id,
+    "accounts": [
+      { "id": 1, "name": 'Investment account 1', "amount": 1000.0 },
+    ],
+  }
+  
+  oauth_payload = {
+    "userId": user_id,
+    # accessToken is for pulling data interchange 
+    # "accessToken": 'access-token-for-authorized-user",
+    "accounts": accounts,    
+  }
+  
+  try:
+    moneymadeConnect.finish_oauth_request(oauth_signature, oauth_payload)
+  except Exception as e:
+    error = str(e)
+    
+    if error == 'Oauth signature is not valid or expired':
+      return { "error": error }, 400
+
+    return { "error": 'Internal Server Error' }, 500
+  
+  return { "status": 'OK' }, 200
