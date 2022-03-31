@@ -1,2 +1,4 @@
 Flask==2.0.2
 Flask-Script==2.0.6
+moneymade-connect-oauth-python-sdk==0.0.10
+python-dotenv==0.19.2

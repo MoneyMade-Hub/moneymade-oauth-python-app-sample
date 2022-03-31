@@ -1,4 +1,19 @@
+import os
+
+from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory
+
+from moneymade_connect_python_sdk import moneymade_connect
+  
+load_dotenv()
+
+PRIVATE_KEY = os.getenv('PRIVATE_KEY')
+PUBLIC_KEY = os.getenv('PUBLIC_KEY')
+
+moneymadeConnect = moneymade_connect.MoneyMadeConnect(private_key=PRIVATE_KEY,
+                                                      public_key=PUBLIC_KEY,
+                                                      env='development'
+                                                    )
 
 app = Flask(__name__)
 
