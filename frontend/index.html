@@ -148,12 +148,8 @@
             return setError(data.error);
           }
 
-          // closing opened page with success in the moneymade connect widget
-          // applied only for v1 version
-          // https://docs.moneymade.io/docs/interaction/connect-flow#close-oauth-popup
-
-          window.parent && window.parent.postMessage({ status: 'OK' }, '*');
-          window.opener && window.opener.postMessage({ status: 'OK' }, '*');
+          // Redirect to moneymade oauth callback url
+          window.location = data.redirect_url;
         }
 
       </script>

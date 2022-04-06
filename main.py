@@ -12,7 +12,8 @@ PUBLIC_KEY = os.getenv('PUBLIC_KEY')
 
 moneymadeConnect = moneymade_connect.MoneyMadeConnect(private_key=PRIVATE_KEY,
                                                       public_key=PUBLIC_KEY,
-                                                      env='development'
+                                                      env='development',
+                                                      version='v2'
                                                     )
 
 app = Flask(__name__)
@@ -72,7 +73,7 @@ def handle_oauth():
     "userId": user_id,
     # accessToken is for pulling data interchange 
     # "accessToken": 'access-token-for-authorized-user",
-    "accounts": accounts,    
+    "accounts": accounts,
   }
   
   try:
@@ -85,4 +86,6 @@ def handle_oauth():
 
     return { "error": 'Internal Server Error' }, 500
   
-  return { "status": 'OK' }, 200
+  redirect_url = moneymadeConnect.get_finish_oauth_redirect_url(oauth_signature)
+  
+  return { "status": 'OK', "redirect_url": redirect_url }, 200
