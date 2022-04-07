@@ -62,18 +62,12 @@ def handle_oauth():
   # typically it's loaded from database or somewhere else for authorized user
   # dict keys are set by moneymade.io devs team according to your payload sample
   # so this dict is agnostic, fell free to use siutable data types 
-  accounts = {
-    "userId": user_id,
-    "accounts": [
-      { "id": 1, "name": 'Investment account 1', "amount": 1000.0 },
-    ],
-  }
   
   oauth_payload = {
-    "userId": user_id,
-    # accessToken is for pulling data interchange 
-    # "accessToken": 'access-token-for-authorized-user",
-    "accounts": accounts,
+    "userId": "2a7708cf-cdd7-463e-92f3-1cc07dc7074c",
+    "accounts": [
+        {"id": 2, "name": "Repaid", "amount": 1000.0},
+    ]
   }
   
   try:
